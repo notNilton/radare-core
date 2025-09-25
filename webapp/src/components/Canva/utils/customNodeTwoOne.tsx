@@ -1,7 +1,16 @@
 import React, { memo } from "react";
 import { Handle, Position } from "reactflow";
 
-const customNodeOneThree = ({ data }) => {
+interface CustomNodeData {
+  label: string;
+  isConnectable: boolean;
+}
+
+interface CustomNodeProps {
+  data: CustomNodeData;
+}
+
+const CustomNodeTwoOne: React.FC<CustomNodeProps> = ({ data }) => {
   const { label, isConnectable } = data;
 
   return (
@@ -12,7 +21,7 @@ const customNodeOneThree = ({ data }) => {
         position={Position.Left}
         style={{ background: "black" }}
         isConnectable={isConnectable}
-      ></Handle>
+      />
 
       <Handle
         type="target"
@@ -20,7 +29,7 @@ const customNodeOneThree = ({ data }) => {
         id="b"
         style={{ background: "black" }}
         isConnectable={isConnectable}
-      ></Handle>
+      />
 
       <Handle
         type="source"
@@ -28,11 +37,11 @@ const customNodeOneThree = ({ data }) => {
         id="c"
         style={{ background: "#784be8" }}
         isConnectable={isConnectable}
-      ></Handle>
+      />
 
-      <div>{`${label}`}</div>
+      <div>{label}</div>
     </>
   );
 };
 
-export default memo(customNodeOneThree);
+export default memo(CustomNodeTwoOne);

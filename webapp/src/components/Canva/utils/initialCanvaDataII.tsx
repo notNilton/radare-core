@@ -1,20 +1,9 @@
-import React, { useCallback } from "react";
-import ReactFlow, {
-  Controls,
-  Background,
-  useNodesState,
-  useEdgesState,
-  addEdge,
-  Connection,
-  Edge,
-  Panel,
-  MarkerType,
-} from "reactflow";
+import { MarkerType } from "reactflow";
 
 import cnOneThree from "./customNodeOneThree";
 import cnOneOne from "./customNodeOneOne";
 import cnTwoTwo from "./customNodeTwoTwo";
-import cnTwoOne from "./customNodeOneTwo";
+import cnTwoOne from "./customNodeTwoOne";
 import cnOneTwo from "./customNodeOneTwo";
 
 const nodeTypes = {
@@ -25,7 +14,7 @@ const nodeTypes = {
   cnOneTwo: cnOneTwo,
 };
 
-const getRandomValue = (min, max) =>
+const getRandomValue = (min: number, max: number) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
 const initialNodes = [
@@ -108,8 +97,10 @@ const initialEdges = [
     id: "e1-2",
     source: "input",
     target: "node-1",
-    label: getRandomValue(50, 200),
-    tolerance: getRandomValue(0.01, 0.1),
+    data: {
+      value: getRandomValue(50, 200),
+      tolerance: getRandomValue(0.01, 0.1),
+    },
     markerEnd: {
       type: MarkerType.ArrowClosed,
     },
@@ -119,8 +110,10 @@ const initialEdges = [
     source: "node-1",
     sourceHandle: "a",
     target: "output-1",
-    label: getRandomValue(50, 200),
-    tolerance: getRandomValue(0.01, 0.1),
+    data: {
+      value: getRandomValue(50, 200),
+      tolerance: getRandomValue(0.01, 0.1),
+    },
     markerEnd: {
       type: MarkerType.ArrowClosed,
     },
@@ -130,8 +123,10 @@ const initialEdges = [
     source: "node-1",
     sourceHandle: "b",
     target: "node-2",
-    label: getRandomValue(50, 200),
-    tolerance: getRandomValue(0.01, 0.1),
+    data: {
+      value: getRandomValue(50, 200),
+      tolerance: getRandomValue(0.01, 0.1),
+    },
     markerEnd: {
       type: MarkerType.ArrowClosed,
     },
@@ -140,8 +135,10 @@ const initialEdges = [
     id: "e4-5",
     source: "node-2",
     target: "output-2",
-    label: getRandomValue(50, 200),
-    tolerance: getRandomValue(0.01, 0.1),
+    data: {
+      value: getRandomValue(50, 200),
+      tolerance: getRandomValue(0.01, 0.1),
+    },
     markerEnd: {
       type: MarkerType.ArrowClosed,
     },
@@ -151,8 +148,10 @@ const initialEdges = [
     source: "node-2",
     sourceHandle: "b",
     target: "output-3",
-    label: getRandomValue(50, 200),
-    tolerance: getRandomValue(0.01, 0.1),
+    data: {
+      value: getRandomValue(50, 200),
+      tolerance: getRandomValue(0.01, 0.1),
+    },
     markerEnd: {
       type: MarkerType.ArrowClosed,
     },
@@ -160,31 +159,3 @@ const initialEdges = [
 ];
 
 export { initialNodes, initialEdges, nodeTypes };
-
-const Flow = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-
-  const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
-
-  return (
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      onConnect={onConnect}
-      nodeTypes={nodeTypes}
-      fitView
-    >
-      <Controls />
-      <Background />
-      <Panel position="top-left" />
-    </ReactFlow>
-  );
-};
-
-export default Flow;

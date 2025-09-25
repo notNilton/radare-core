@@ -9,6 +9,7 @@ import ReactFlow, {
   BackgroundVariant,
   Connection,
   Edge,
+  Node,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import "./Node.scss";
@@ -30,17 +31,28 @@ const generateRandomName = () => {
 
 const getNodeId = () => `randomnode_${+new Date()}`;
 
-const Node: React.FC = () => {
+interface EdgeData {
+  nome: string;
+  value?: number;
+  tolerance?: number;
+}
+
+const NodeView: React.FC = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(
-    initialEdges.map((edge) => ({
-      ...edge,
-      nome: edge.nome || generateRandomName(),
-      label: `Nome: ${edge.nome || generateRandomName()}, Valor: ${
-        edge.value
-      }, Tolerância: ${edge.tolerance}`,
-      type: "step",
-    }))
+  const [edges, setEdges, onEdgesChange] = useEdgesState<EdgeData>(
+    initialEdges.map((edge) => {
+      const data = edge.data || {};
+      return {
+        ...edge,
+        data: {
+          nome: data.nome || generateRandomName(),
+          value: data.value,
+          tolerance: data.tolerance,
+        },
+        label: `Nome: ${data.nome || "Novo"}, Valor: ${data.value || "N/A"}, Tolerância: ${data.tolerance || "N/A"}`,
+        type: "step",
+      };
+    })
   );
 
   const nodesRef = useRef(nodes);
@@ -57,53 +69,56 @@ const Node: React.FC = () => {
   }, [edges]);
 
   const onConnect = useCallback(
-    (params: Edge | Connection) => {
-      const newEdge = {
-        ...params,
-        nome: generateRandomName(), // Adiciona um nome aleatório
-        label: `Nome: ${generateRandomName()}, Valor: ${
-          params.label || ""
-        }, Tolerância: ${params.tolerance || ""}`,
-        type: "step", // Definindo o tipo da aresta como 'step'
+    (params: Connection) => {
+      const nome = generateRandomName();
+      const newEdge: Edge<EdgeData> = {
+        id: `e${params.source}-${params.target}-${nome}`,
+        source: params.source!,
+        target: params.target!,
+        data: {
+          nome,
+          value: undefined,
+          tolerance: undefined,
+        },
+        label: `Nome: ${nome}, Valor: N/A, Tolerância: N/A`,
+        type: "step",
       };
       setEdges((eds) => addEdge(newEdge, eds));
     },
     [setEdges]
   );
 
-  const onEdgeDoubleClick = (edgeId: string) => {
-    const labelValue = window.prompt(
-      "Digite um valor para o rótulo da aresta:"
-    );
-    const toleranceValue = window.prompt("Digite um valor para a tolerância:");
+  const onEdgeDoubleClick = (_: React.MouseEvent, edge: Edge<EdgeData>) => {
+    const valueStr = window.prompt("Digite um valor para a aresta:");
+    const toleranceStr = window.prompt("Digite um valor para a tolerância:");
 
-    if (
-      labelValue &&
-      toleranceValue &&
-      !isNaN(Number(labelValue)) &&
-      !isNaN(Number(toleranceValue))
-    ) {
-      const numericLabel = parseFloat(labelValue);
-      const numericTolerance = parseFloat(toleranceValue);
+    if (valueStr && toleranceStr && !isNaN(Number(valueStr)) && !isNaN(Number(toleranceStr))) {
+      const value = parseFloat(valueStr);
+      const tolerance = parseFloat(toleranceStr);
 
       setEdges((prevEdges) =>
-        prevEdges.map((edge) =>
-          edge.id === edgeId
-            ? {
-                ...edge,
-                value: numericLabel,
-                tolerance: numericTolerance,
-                label: `Nome: ${edge.nome}, Valor: ${numericLabel}, Tolerância: ${numericTolerance}`,
-              }
-            : edge
-        )
+        prevEdges.map((e) => {
+          if (e.id === edge.id) {
+            const newData: EdgeData = {
+              ...(e.data || { nome: generateRandomName() }),
+              value,
+              tolerance,
+            };
+            return {
+              ...e,
+              data: newData,
+              label: `Nome: ${newData.nome}, Valor: ${value}, Tolerância: ${tolerance}`,
+            };
+          }
+          return e;
+        })
       );
     }
   };
 
   const addNode = useCallback(
     (nodeType: string) => {
-      const newNode = {
+      const newNode: Node = {
         id: getNodeId(),
         type: nodeType,
         data: { label: "Simples", isConnectable: true },
@@ -128,25 +143,22 @@ const Node: React.FC = () => {
   ) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Gera a matriz de adjacência e os nomes das arestas, necessários para a reconciliação
-      const edgeNames = edges.map((edge) => edge.nome);
-      const incidenceMatrix = createAdjacencyMatrix(nodes, edges); // Cria a matriz de incidência
+      const edgeNames = edges.map((edge) => (edge.data ? edge.data.nome : ""));
+      const incidenceMatrix = createAdjacencyMatrix(nodes, edges);
   
-      // Agora usando a função reconciliarApi para processar o arquivo JSON
       reconciliarApi(
-        incidenceMatrix, // Passa a matriz de incidência gerada
-        [], // Placeholder para values, que será sobrescrito pelo JSON
-        [], // Placeholder para tolerances, que será sobrescrito pelo JSON
-        edgeNames, // Passa os nomes das arestas
+        incidenceMatrix,
+        [],
+        [],
+        edgeNames,
         (message) => console.log(message),
-        file // Passa o arquivo JSON
+        file
       );
     }
   };
   
-
   const handleReconcile = () => {
-    const edgeNames = edges.map((edge) => edge.nome);
+    const edgeNames = edges.map((edge) => (edge.data ? edge.data.nome : ""));
     calcularReconciliacao(
       nodes,
       edges,
@@ -155,10 +167,9 @@ const Node: React.FC = () => {
         console.log(message);
       },
       edgeNames
-    ); // Passando edgeNames para a função
+    );
   };
   
-
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
   };
@@ -179,8 +190,6 @@ const Node: React.FC = () => {
     );
   };
 
-  const edgeNames = edges.map((edge) => edge.nome);
-
   return (
     <div
       className={`node-container ${isSidebarVisible ? "" : "sidebar-hidden"}`}
@@ -191,10 +200,10 @@ const Node: React.FC = () => {
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          onConnect={onConnect} // Use o seu onConnect personalizado aqui
+          onConnect={onConnect}
           nodeTypes={nodeTypes}
           fitView
-          onEdgeDoubleClick={(event, edge) => onEdgeDoubleClick(edge.id)}
+          onEdgeDoubleClick={onEdgeDoubleClick}
         >
           <Panel position="top-left" className="top-left-panel custom-panel">
             <PanelButtons
@@ -214,11 +223,7 @@ const Node: React.FC = () => {
 
         {isSidebarVisible && (
           <div className="sidebar-component">
-            <SidebarComponent
-              nodes={nodes}
-              edges={edges}
-              edgeNames={edgeNames}
-            />
+            <SidebarComponent />
           </div>
         )}
       </div>
@@ -232,4 +237,4 @@ const Node: React.FC = () => {
   );
 };
 
-export default Node;
+export default NodeView;

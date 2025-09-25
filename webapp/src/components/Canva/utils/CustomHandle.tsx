@@ -8,7 +8,6 @@ import {
   HandleProps,
   Position,
   Edge,
-  Node,
 } from "reactflow";
 
 // Define the StoreState interface manually if it's not exported by reactflow

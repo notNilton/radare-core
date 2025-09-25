@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import SidebarComponent from "../components/Sidebar/SidebarComponent";
 import GraphComponent from "../components/Graph/GraphComponent";
 import NavbarComponent from "../components/Navbar/NavbarComponent";
 import Node from "../components/Canva/Node";
@@ -16,9 +15,6 @@ const HomePage: React.FC = () => {
     <div className="home">
       <div className="navbar-container">
         <NavbarComponent version={""} />
-      </div>
-      <div className="sidebar-container">
-        <SidebarComponent nodes={[]} edges={[]} edgeNames={[]} />
       </div>
       <div className="graph-container">
         <GraphComponent />
