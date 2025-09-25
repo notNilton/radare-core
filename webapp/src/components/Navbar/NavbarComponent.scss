@@ -1,0 +1,85 @@
+@import "../../styles/Variables.scss";
+
+.navbar-menu {
+  position: relative;
+  display: flex;
+  background: linear-gradient(120deg, $ColorBgSecondary, $ColorBgPrimary, $ColorBgSecondary);
+}
+
+.navbar-icon {
+  background-color: transparent;
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+
+  .user-icon {
+    width: auto;
+    height: 100%;
+    color: $ColorWhite;
+    background-color: transparent;
+
+    &:hover {
+      transform: scale(1.2);
+      color: $ColorAccent;
+    }
+  }
+}
+
+.navbar-item {
+  padding: 5px;
+  padding-inline: 10px;
+  margin-inline: 2px;
+  background-color: $ColorPrimary;
+
+  >button {
+    transition: color 0.2s;
+    color: $ColorBlack;
+    font-weight: bold; // Tornando o texto em negrito
+  }
+
+  >ul {
+    visibility: hidden;
+    position: absolute;
+    display: block;
+    margin: 5px -10px;
+    padding: 0;
+    background: $ColorPrimary;
+
+    >li {
+      padding: 10px;
+
+      >button {
+        color: $ColorBlack;
+        font-weight: bold; // Tornando o texto em negrito
+      }
+
+      &:hover {
+        background-color: $ColorAccent;
+        cursor: pointer;
+
+        >button {
+          color: $ColorWhite;
+        }
+      }
+    }
+  }
+
+  &:hover {
+    background: $ColorAccent;
+    cursor: pointer;
+
+    >button {
+      color: $ColorWhite;
+      font-weight: bold; // Tornando o texto em negrito
+    }
+
+    >ul {
+      z-index: 3;
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+}
