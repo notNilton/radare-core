@@ -2,72 +2,95 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
+	"log"
 	"net/http"
-	"sync"
+	"radare.com/backend/ent"
+	"radare.com/backend/ent/valuelog"
 	"time"
-	// Import the middleware package (not needed here, but might be in other handlers)
 )
 
-// Estrutura para representar os valores
-type CurrentValues struct {
-	Value1 int `json:"value1"`
-	Value2 int `json:"value2"`
+// Handler é uma struct que contém o cliente do banco de dados.
+type Handler struct {
+	client *ent.Client
 }
 
-var (
-	currentValues CurrentValues
-	mutex         sync.RWMutex // Mutex para garantir acesso seguro aos valores
-)
-
-// Inicializa a variação dos valores
-func init() {
-	go updateValues()
+// New cria uma nova instância de Handler.
+func New(client *ent.Client) *Handler {
+	return &Handler{client: client}
 }
 
-// updateValues atualiza os valores a cada segundo
-func updateValues() {
+// StartValueUpdater inicia uma goroutine para atualizar os valores no banco de dados.
+func (h *Handler) StartValueUpdater() {
+	var value1, value2 = 50, 100 // Valores iniciais
+	ticker := time.NewTicker(1 * time.Second)
+	defer ticker.Stop()
+
 	for {
-		// Bloqueia o mutex para escrita
-		mutex.Lock()
-		// Alterna os valores entre 50 e 100
-		if currentValues.Value1 == 50 {
-			currentValues.Value1 = 100
-			currentValues.Value2 = 50
-		} else {
-			currentValues.Value1 = 50
-			currentValues.Value2 = 100
-		}
-		// Libera o mutex
-		mutex.Unlock()
+		select {
+		case <-ticker.C:
+			// Alterna os valores
+			value1, value2 = value2, value1
 
-		// Aguarda 1 segundo antes de atualizar novamente
-		time.Sleep(1 * time.Second)
+			// Cria um novo registro no banco de dados
+			_, err := h.client.ValueLog.
+				Create().
+				SetValue1(value1).
+				SetValue2(value2).
+				Save(context.Background())
+			if err != nil {
+				log.Printf("Erro ao salvar valores no banco de dados: %v", err)
+			}
+		}
 	}
 }
 
-// GetCurrentValues retorna os valores atuais
-func GetCurrentValues(w http.ResponseWriter, r *http.Request) error { // Retorna um erro
-	// Configura o cabeçalho para indicar que a resposta é JSON
+// GetCurrentValues retorna o registro mais recente do banco de dados.
+func (h *Handler) GetCurrentValues(w http.ResponseWriter, r *http.Request) error {
+	// Busca o último registro pelo ID em ordem decrescente
+	latest, err := h.client.ValueLog.
+		Query().
+		Order(ent.Desc(valuelog.FieldID)).
+		First(r.Context())
+	if err != nil {
+		// Se não houver registros, retorna um erro amigável
+		if ent.IsNotFound(err) {
+			http.Error(w, "Nenhum valor encontrado ainda. Tente novamente em alguns segundos.", http.StatusNotFound)
+			return nil
+		}
+		// Para outros erros, retorna o erro para o middleware
+		return err
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-
-	// Bloqueia o mutex para leitura
-	mutex.RLock()
-	values := currentValues
-	mutex.RUnlock()
-
-	// Converte a estrutura para JSON e envia como resposta
-	if err := json.NewEncoder(w).Encode(values); err != nil {
-		return err // Retorna o erro para o middleware
+	if err := json.NewEncoder(w).Encode(latest); err != nil {
+		return err
 	}
 	return nil
 }
 
-// HealthCheck retorna o status do servidor
-func HealthCheck(w http.ResponseWriter, r *http.Request) error { // Retorna um erro
-	// Você pode adicionar lógica aqui para verificar a saúde do seu servidor
+// GetValueHistory retorna os últimos 10 registros do banco de dados.
+func (h *Handler) GetValueHistory(w http.ResponseWriter, r *http.Request) error {
+	// Busca os últimos 10 registros
+	history, err := h.client.ValueLog.
+		Query().
+		Order(ent.Desc(valuelog.FieldID)).
+		Limit(10).
+		All(r.Context())
+	if err != nil {
+		return err
+	}
 
-	// Por enquanto, vamos apenas retornar um status 200 OK
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(history); err != nil {
+		return err
+	}
+	return nil
+}
+
+// HealthCheck retorna o status do servidor.
+func HealthCheck(w http.ResponseWriter, r *http.Request) error {
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(map[string]string{"status": "ok"}); err != nil {
 		return err
