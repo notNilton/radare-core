@@ -1,0 +1,21 @@
+# Ignore git files
+.git
+.gitignore
+
+# Ignore node_modules
+node_modules
+
+# Ignore build artifacts
+/backend/main
+/webapp/dist
+
+# Ignore local development files
+.env
+npm-debug.log
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
