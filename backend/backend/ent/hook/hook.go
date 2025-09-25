@@ -5,8 +5,7 @@ package hook
 import (
 	"context"
 	"fmt"
-
-	"radare.com/backend/backend/backend/ent"
+	"radare-core/backend/backend/ent"
 )
 
 // The ValueLogFunc type is an adapter to allow the use of ordinary

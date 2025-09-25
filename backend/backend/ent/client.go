@@ -9,12 +9,13 @@ import (
 	"log"
 	"reflect"
 
-	"radare.com/backend/backend/backend/ent/migrate"
+	"radare-core/backend/backend/ent/migrate"
+
+	"radare-core/backend/backend/ent/valuelog"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
-	"radare.com/backend/backend/backend/ent/valuelog"
 )
 
 // Client is the client that holds all ent builders.

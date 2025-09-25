@@ -6,13 +6,13 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"radare-core/backend/backend/ent/predicate"
+	"radare-core/backend/backend/ent/valuelog"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"radare.com/backend/backend/backend/ent/predicate"
-	"radare.com/backend/backend/backend/ent/valuelog"
 )
 
 // ValueLogQuery is the builder for querying ValueLog entities.
@@ -258,6 +258,18 @@ func (_q *ValueLogQuery) Clone() *ValueLogQuery {
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		Value1 int `json:"value1,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.ValueLog.Query().
+//		GroupBy(valuelog.FieldValue1).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
 func (_q *ValueLogQuery) GroupBy(field string, fields ...string) *ValueLogGroupBy {
 	_q.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &ValueLogGroupBy{build: _q}
@@ -269,6 +281,16 @@ func (_q *ValueLogQuery) GroupBy(field string, fields ...string) *ValueLogGroupB
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		Value1 int `json:"value1,omitempty"`
+//	}
+//
+//	client.ValueLog.Query().
+//		Select(valuelog.FieldValue1).
+//		Scan(ctx, &v)
 func (_q *ValueLogQuery) Select(fields ...string) *ValueLogSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
 	sbuild := &ValueLogSelect{ValueLogQuery: _q}

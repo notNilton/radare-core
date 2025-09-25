@@ -4,12 +4,12 @@ package ent
 
 import (
 	"context"
+	"radare-core/backend/backend/ent/predicate"
+	"radare-core/backend/backend/ent/valuelog"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"radare.com/backend/backend/backend/ent/predicate"
-	"radare.com/backend/backend/backend/ent/valuelog"
 )
 
 // ValueLogDelete is the builder for deleting a ValueLog entity.

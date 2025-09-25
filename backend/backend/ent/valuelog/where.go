@@ -3,8 +3,10 @@
 package valuelog
 
 import (
+	"radare-core/backend/backend/ent/predicate"
+	"time"
+
 	"entgo.io/ent/dialect/sql"
-	"radare.com/backend/backend/backend/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.
@@ -50,6 +52,141 @@ func IDLT(id int) predicate.ValueLog {
 // IDLTE applies the LTE predicate on the ID field.
 func IDLTE(id int) predicate.ValueLog {
 	return predicate.ValueLog(sql.FieldLTE(FieldID, id))
+}
+
+// Value1 applies equality check predicate on the "value1" field. It's identical to Value1EQ.
+func Value1(v int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldEQ(FieldValue1, v))
+}
+
+// Value2 applies equality check predicate on the "value2" field. It's identical to Value2EQ.
+func Value2(v int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldEQ(FieldValue2, v))
+}
+
+// Timestamp applies equality check predicate on the "timestamp" field. It's identical to TimestampEQ.
+func Timestamp(v time.Time) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldEQ(FieldTimestamp, v))
+}
+
+// Value1EQ applies the EQ predicate on the "value1" field.
+func Value1EQ(v int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldEQ(FieldValue1, v))
+}
+
+// Value1NEQ applies the NEQ predicate on the "value1" field.
+func Value1NEQ(v int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldNEQ(FieldValue1, v))
+}
+
+// Value1In applies the In predicate on the "value1" field.
+func Value1In(vs ...int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldIn(FieldValue1, vs...))
+}
+
+// Value1NotIn applies the NotIn predicate on the "value1" field.
+func Value1NotIn(vs ...int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldNotIn(FieldValue1, vs...))
+}
+
+// Value1GT applies the GT predicate on the "value1" field.
+func Value1GT(v int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldGT(FieldValue1, v))
+}
+
+// Value1GTE applies the GTE predicate on the "value1" field.
+func Value1GTE(v int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldGTE(FieldValue1, v))
+}
+
+// Value1LT applies the LT predicate on the "value1" field.
+func Value1LT(v int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldLT(FieldValue1, v))
+}
+
+// Value1LTE applies the LTE predicate on the "value1" field.
+func Value1LTE(v int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldLTE(FieldValue1, v))
+}
+
+// Value2EQ applies the EQ predicate on the "value2" field.
+func Value2EQ(v int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldEQ(FieldValue2, v))
+}
+
+// Value2NEQ applies the NEQ predicate on the "value2" field.
+func Value2NEQ(v int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldNEQ(FieldValue2, v))
+}
+
+// Value2In applies the In predicate on the "value2" field.
+func Value2In(vs ...int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldIn(FieldValue2, vs...))
+}
+
+// Value2NotIn applies the NotIn predicate on the "value2" field.
+func Value2NotIn(vs ...int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldNotIn(FieldValue2, vs...))
+}
+
+// Value2GT applies the GT predicate on the "value2" field.
+func Value2GT(v int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldGT(FieldValue2, v))
+}
+
+// Value2GTE applies the GTE predicate on the "value2" field.
+func Value2GTE(v int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldGTE(FieldValue2, v))
+}
+
+// Value2LT applies the LT predicate on the "value2" field.
+func Value2LT(v int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldLT(FieldValue2, v))
+}
+
+// Value2LTE applies the LTE predicate on the "value2" field.
+func Value2LTE(v int) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldLTE(FieldValue2, v))
+}
+
+// TimestampEQ applies the EQ predicate on the "timestamp" field.
+func TimestampEQ(v time.Time) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldEQ(FieldTimestamp, v))
+}
+
+// TimestampNEQ applies the NEQ predicate on the "timestamp" field.
+func TimestampNEQ(v time.Time) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldNEQ(FieldTimestamp, v))
+}
+
+// TimestampIn applies the In predicate on the "timestamp" field.
+func TimestampIn(vs ...time.Time) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldIn(FieldTimestamp, vs...))
+}
+
+// TimestampNotIn applies the NotIn predicate on the "timestamp" field.
+func TimestampNotIn(vs ...time.Time) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldNotIn(FieldTimestamp, vs...))
+}
+
+// TimestampGT applies the GT predicate on the "timestamp" field.
+func TimestampGT(v time.Time) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldGT(FieldTimestamp, v))
+}
+
+// TimestampGTE applies the GTE predicate on the "timestamp" field.
+func TimestampGTE(v time.Time) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldGTE(FieldTimestamp, v))
+}
+
+// TimestampLT applies the LT predicate on the "timestamp" field.
+func TimestampLT(v time.Time) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldLT(FieldTimestamp, v))
+}
+
+// TimestampLTE applies the LTE predicate on the "timestamp" field.
+func TimestampLTE(v time.Time) predicate.ValueLog {
+	return predicate.ValueLog(sql.FieldLTE(FieldTimestamp, v))
 }
 
 // And groups predicates with the AND operator between them.

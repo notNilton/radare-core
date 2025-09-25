@@ -6,11 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"radare-core/backend/backend/ent/predicate"
+	"radare-core/backend/backend/ent/valuelog"
 	"sync"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"radare.com/backend/backend/backend/ent/predicate"
 )
 
 const (
@@ -31,6 +33,11 @@ type ValueLogMutation struct {
 	op            Op
 	typ           string
 	id            *int
+	value1        *int
+	addvalue1     *int
+	value2        *int
+	addvalue2     *int
+	timestamp     *time.Time
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*ValueLog, error)
@@ -135,6 +142,154 @@ func (m *ValueLogMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
+// SetValue1 sets the "value1" field.
+func (m *ValueLogMutation) SetValue1(i int) {
+	m.value1 = &i
+	m.addvalue1 = nil
+}
+
+// Value1 returns the value of the "value1" field in the mutation.
+func (m *ValueLogMutation) Value1() (r int, exists bool) {
+	v := m.value1
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldValue1 returns the old "value1" field's value of the ValueLog entity.
+// If the ValueLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ValueLogMutation) OldValue1(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldValue1 is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldValue1 requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldValue1: %w", err)
+	}
+	return oldValue.Value1, nil
+}
+
+// AddValue1 adds i to the "value1" field.
+func (m *ValueLogMutation) AddValue1(i int) {
+	if m.addvalue1 != nil {
+		*m.addvalue1 += i
+	} else {
+		m.addvalue1 = &i
+	}
+}
+
+// AddedValue1 returns the value that was added to the "value1" field in this mutation.
+func (m *ValueLogMutation) AddedValue1() (r int, exists bool) {
+	v := m.addvalue1
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetValue1 resets all changes to the "value1" field.
+func (m *ValueLogMutation) ResetValue1() {
+	m.value1 = nil
+	m.addvalue1 = nil
+}
+
+// SetValue2 sets the "value2" field.
+func (m *ValueLogMutation) SetValue2(i int) {
+	m.value2 = &i
+	m.addvalue2 = nil
+}
+
+// Value2 returns the value of the "value2" field in the mutation.
+func (m *ValueLogMutation) Value2() (r int, exists bool) {
+	v := m.value2
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldValue2 returns the old "value2" field's value of the ValueLog entity.
+// If the ValueLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ValueLogMutation) OldValue2(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldValue2 is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldValue2 requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldValue2: %w", err)
+	}
+	return oldValue.Value2, nil
+}
+
+// AddValue2 adds i to the "value2" field.
+func (m *ValueLogMutation) AddValue2(i int) {
+	if m.addvalue2 != nil {
+		*m.addvalue2 += i
+	} else {
+		m.addvalue2 = &i
+	}
+}
+
+// AddedValue2 returns the value that was added to the "value2" field in this mutation.
+func (m *ValueLogMutation) AddedValue2() (r int, exists bool) {
+	v := m.addvalue2
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetValue2 resets all changes to the "value2" field.
+func (m *ValueLogMutation) ResetValue2() {
+	m.value2 = nil
+	m.addvalue2 = nil
+}
+
+// SetTimestamp sets the "timestamp" field.
+func (m *ValueLogMutation) SetTimestamp(t time.Time) {
+	m.timestamp = &t
+}
+
+// Timestamp returns the value of the "timestamp" field in the mutation.
+func (m *ValueLogMutation) Timestamp() (r time.Time, exists bool) {
+	v := m.timestamp
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTimestamp returns the old "timestamp" field's value of the ValueLog entity.
+// If the ValueLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ValueLogMutation) OldTimestamp(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTimestamp is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTimestamp requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTimestamp: %w", err)
+	}
+	return oldValue.Timestamp, nil
+}
+
+// ResetTimestamp resets all changes to the "timestamp" field.
+func (m *ValueLogMutation) ResetTimestamp() {
+	m.timestamp = nil
+}
+
 // Where appends a list predicates to the ValueLogMutation builder.
 func (m *ValueLogMutation) Where(ps ...predicate.ValueLog) {
 	m.predicates = append(m.predicates, ps...)
@@ -169,7 +324,16 @@ func (m *ValueLogMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ValueLogMutation) Fields() []string {
-	fields := make([]string, 0, 0)
+	fields := make([]string, 0, 3)
+	if m.value1 != nil {
+		fields = append(fields, valuelog.FieldValue1)
+	}
+	if m.value2 != nil {
+		fields = append(fields, valuelog.FieldValue2)
+	}
+	if m.timestamp != nil {
+		fields = append(fields, valuelog.FieldTimestamp)
+	}
 	return fields
 }
 
@@ -177,6 +341,14 @@ func (m *ValueLogMutation) Fields() []string {
 // return value indicates that this field was not set, or was not defined in the
 // schema.
 func (m *ValueLogMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case valuelog.FieldValue1:
+		return m.Value1()
+	case valuelog.FieldValue2:
+		return m.Value2()
+	case valuelog.FieldTimestamp:
+		return m.Timestamp()
+	}
 	return nil, false
 }
 
@@ -184,6 +356,14 @@ func (m *ValueLogMutation) Field(name string) (ent.Value, bool) {
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
 func (m *ValueLogMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case valuelog.FieldValue1:
+		return m.OldValue1(ctx)
+	case valuelog.FieldValue2:
+		return m.OldValue2(ctx)
+	case valuelog.FieldTimestamp:
+		return m.OldTimestamp(ctx)
+	}
 	return nil, fmt.Errorf("unknown ValueLog field %s", name)
 }
 
@@ -192,6 +372,27 @@ func (m *ValueLogMutation) OldField(ctx context.Context, name string) (ent.Value
 // type.
 func (m *ValueLogMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case valuelog.FieldValue1:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetValue1(v)
+		return nil
+	case valuelog.FieldValue2:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetValue2(v)
+		return nil
+	case valuelog.FieldTimestamp:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTimestamp(v)
+		return nil
 	}
 	return fmt.Errorf("unknown ValueLog field %s", name)
 }
@@ -199,13 +400,26 @@ func (m *ValueLogMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *ValueLogMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addvalue1 != nil {
+		fields = append(fields, valuelog.FieldValue1)
+	}
+	if m.addvalue2 != nil {
+		fields = append(fields, valuelog.FieldValue2)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *ValueLogMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case valuelog.FieldValue1:
+		return m.AddedValue1()
+	case valuelog.FieldValue2:
+		return m.AddedValue2()
+	}
 	return nil, false
 }
 
@@ -213,6 +427,22 @@ func (m *ValueLogMutation) AddedField(name string) (ent.Value, bool) {
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
 func (m *ValueLogMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case valuelog.FieldValue1:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddValue1(v)
+		return nil
+	case valuelog.FieldValue2:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddValue2(v)
+		return nil
+	}
 	return fmt.Errorf("unknown ValueLog numeric field %s", name)
 }
 
@@ -238,6 +468,17 @@ func (m *ValueLogMutation) ClearField(name string) error {
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
 func (m *ValueLogMutation) ResetField(name string) error {
+	switch name {
+	case valuelog.FieldValue1:
+		m.ResetValue1()
+		return nil
+	case valuelog.FieldValue2:
+		m.ResetValue2()
+		return nil
+	case valuelog.FieldTimestamp:
+		m.ResetTimestamp()
+		return nil
+	}
 	return fmt.Errorf("unknown ValueLog field %s", name)
 }
 

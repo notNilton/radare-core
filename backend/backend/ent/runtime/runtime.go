@@ -2,7 +2,7 @@
 
 package runtime
 
-// The schema-stitching logic is generated in radare.com/backend/backend/backend/ent/runtime.go
+// The schema-stitching logic is generated in radare-core/backend/backend/ent/runtime.go
 
 const (
 	Version = "v0.14.5"                                         // Version of ent codegen.

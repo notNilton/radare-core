@@ -3,16 +3,16 @@ package db
 import (
 	"context"
 	"log"
-	"radare.com/backend/ent"
+	"radare-core/backend/backend/ent"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 // NewClient cria e retorna um novo cliente Ent.
 func NewClient() *ent.Client {
 	// Abrir conexão com o banco de dados SQLite.
 	// O arquivo do banco de dados será criado se não existir.
-	client, err := ent.Open("sqlite3", "file:radare.db?cache=shared&_fk=1")
+	client, err := ent.Open("sqlite", "file:radare.db?cache=shared")
 	if err != nil {
 		log.Fatalf("falha ao abrir conexão com o sqlite: %v", err)
 	}

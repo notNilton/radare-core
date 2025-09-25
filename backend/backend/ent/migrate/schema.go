@@ -11,6 +11,9 @@ var (
 	// ValueLogsColumns holds the columns for the "value_logs" table.
 	ValueLogsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "value1", Type: field.TypeInt},
+		{Name: "value2", Type: field.TypeInt},
+		{Name: "timestamp", Type: field.TypeTime},
 	}
 	// ValueLogsTable holds the schema information for the "value_logs" table.
 	ValueLogsTable = &schema.Table{

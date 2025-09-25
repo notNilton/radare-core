@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"radare.com/backend/ent"
-	"radare.com/backend/ent/valuelog"
+	"radare-core/backend/backend/ent"
+	"radare-core/backend/backend/ent/valuelog"
 	"time"
 )
 

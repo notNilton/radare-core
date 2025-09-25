@@ -4,11 +4,13 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"radare-core/backend/backend/ent/valuelog"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"radare.com/backend/backend/backend/ent/valuelog"
 )
 
 // ValueLogCreate is the builder for creating a ValueLog entity.
@@ -18,6 +20,32 @@ type ValueLogCreate struct {
 	hooks    []Hook
 }
 
+// SetValue1 sets the "value1" field.
+func (_c *ValueLogCreate) SetValue1(v int) *ValueLogCreate {
+	_c.mutation.SetValue1(v)
+	return _c
+}
+
+// SetValue2 sets the "value2" field.
+func (_c *ValueLogCreate) SetValue2(v int) *ValueLogCreate {
+	_c.mutation.SetValue2(v)
+	return _c
+}
+
+// SetTimestamp sets the "timestamp" field.
+func (_c *ValueLogCreate) SetTimestamp(v time.Time) *ValueLogCreate {
+	_c.mutation.SetTimestamp(v)
+	return _c
+}
+
+// SetNillableTimestamp sets the "timestamp" field if the given value is not nil.
+func (_c *ValueLogCreate) SetNillableTimestamp(v *time.Time) *ValueLogCreate {
+	if v != nil {
+		_c.SetTimestamp(*v)
+	}
+	return _c
+}
+
 // Mutation returns the ValueLogMutation object of the builder.
 func (_c *ValueLogCreate) Mutation() *ValueLogMutation {
 	return _c.mutation
@@ -25,6 +53,7 @@ func (_c *ValueLogCreate) Mutation() *ValueLogMutation {
 
 // Save creates the ValueLog in the database.
 func (_c *ValueLogCreate) Save(ctx context.Context) (*ValueLog, error) {
+	_c.defaults()
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -50,8 +79,25 @@ func (_c *ValueLogCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (_c *ValueLogCreate) defaults() {
+	if _, ok := _c.mutation.Timestamp(); !ok {
+		v := valuelog.DefaultTimestamp()
+		_c.mutation.SetTimestamp(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (_c *ValueLogCreate) check() error {
+	if _, ok := _c.mutation.Value1(); !ok {
+		return &ValidationError{Name: "value1", err: errors.New(`ent: missing required field "ValueLog.value1"`)}
+	}
+	if _, ok := _c.mutation.Value2(); !ok {
+		return &ValidationError{Name: "value2", err: errors.New(`ent: missing required field "ValueLog.value2"`)}
+	}
+	if _, ok := _c.mutation.Timestamp(); !ok {
+		return &ValidationError{Name: "timestamp", err: errors.New(`ent: missing required field "ValueLog.timestamp"`)}
+	}
 	return nil
 }
 
@@ -78,6 +124,18 @@ func (_c *ValueLogCreate) createSpec() (*ValueLog, *sqlgraph.CreateSpec) {
 		_node = &ValueLog{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(valuelog.Table, sqlgraph.NewFieldSpec(valuelog.FieldID, field.TypeInt))
 	)
+	if value, ok := _c.mutation.Value1(); ok {
+		_spec.SetField(valuelog.FieldValue1, field.TypeInt, value)
+		_node.Value1 = value
+	}
+	if value, ok := _c.mutation.Value2(); ok {
+		_spec.SetField(valuelog.FieldValue2, field.TypeInt, value)
+		_node.Value2 = value
+	}
+	if value, ok := _c.mutation.Timestamp(); ok {
+		_spec.SetField(valuelog.FieldTimestamp, field.TypeTime, value)
+		_node.Timestamp = value
+	}
 	return _node, _spec
 }
 
@@ -99,6 +157,7 @@ func (_c *ValueLogCreateBulk) Save(ctx context.Context) ([]*ValueLog, error) {
 	for i := range _c.builders {
 		func(i int, root context.Context) {
 			builder := _c.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*ValueLogMutation)
 				if !ok {

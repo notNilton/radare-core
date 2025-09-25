@@ -1,6 +1,11 @@
 package schema
 
-import "entgo.io/ent"
+import (
+	"time"
+
+	"entgo.io/ent"
+	"entgo.io/ent/schema/field"
+)
 
 // ValueLog holds the schema definition for the ValueLog entity.
 type ValueLog struct {
@@ -9,7 +14,11 @@ type ValueLog struct {
 
 // Fields of the ValueLog.
 func (ValueLog) Fields() []ent.Field {
-	return nil
+	return []ent.Field{
+		field.Int("value1"),
+		field.Int("value2"),
+		field.Time("timestamp").Default(time.Now),
+	}
 }
 
 // Edges of the ValueLog.

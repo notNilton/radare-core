@@ -6,12 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"radare-core/backend/backend/ent/predicate"
+	"radare-core/backend/backend/ent/valuelog"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"radare.com/backend/backend/backend/ent/predicate"
-	"radare.com/backend/backend/backend/ent/valuelog"
 )
 
 // ValueLogUpdate is the builder for updating ValueLog entities.
@@ -24,6 +25,62 @@ type ValueLogUpdate struct {
 // Where appends a list predicates to the ValueLogUpdate builder.
 func (_u *ValueLogUpdate) Where(ps ...predicate.ValueLog) *ValueLogUpdate {
 	_u.mutation.Where(ps...)
+	return _u
+}
+
+// SetValue1 sets the "value1" field.
+func (_u *ValueLogUpdate) SetValue1(v int) *ValueLogUpdate {
+	_u.mutation.ResetValue1()
+	_u.mutation.SetValue1(v)
+	return _u
+}
+
+// SetNillableValue1 sets the "value1" field if the given value is not nil.
+func (_u *ValueLogUpdate) SetNillableValue1(v *int) *ValueLogUpdate {
+	if v != nil {
+		_u.SetValue1(*v)
+	}
+	return _u
+}
+
+// AddValue1 adds value to the "value1" field.
+func (_u *ValueLogUpdate) AddValue1(v int) *ValueLogUpdate {
+	_u.mutation.AddValue1(v)
+	return _u
+}
+
+// SetValue2 sets the "value2" field.
+func (_u *ValueLogUpdate) SetValue2(v int) *ValueLogUpdate {
+	_u.mutation.ResetValue2()
+	_u.mutation.SetValue2(v)
+	return _u
+}
+
+// SetNillableValue2 sets the "value2" field if the given value is not nil.
+func (_u *ValueLogUpdate) SetNillableValue2(v *int) *ValueLogUpdate {
+	if v != nil {
+		_u.SetValue2(*v)
+	}
+	return _u
+}
+
+// AddValue2 adds value to the "value2" field.
+func (_u *ValueLogUpdate) AddValue2(v int) *ValueLogUpdate {
+	_u.mutation.AddValue2(v)
+	return _u
+}
+
+// SetTimestamp sets the "timestamp" field.
+func (_u *ValueLogUpdate) SetTimestamp(v time.Time) *ValueLogUpdate {
+	_u.mutation.SetTimestamp(v)
+	return _u
+}
+
+// SetNillableTimestamp sets the "timestamp" field if the given value is not nil.
+func (_u *ValueLogUpdate) SetNillableTimestamp(v *time.Time) *ValueLogUpdate {
+	if v != nil {
+		_u.SetTimestamp(*v)
+	}
 	return _u
 }
 
@@ -68,6 +125,21 @@ func (_u *ValueLogUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			}
 		}
 	}
+	if value, ok := _u.mutation.Value1(); ok {
+		_spec.SetField(valuelog.FieldValue1, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedValue1(); ok {
+		_spec.AddField(valuelog.FieldValue1, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.Value2(); ok {
+		_spec.SetField(valuelog.FieldValue2, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedValue2(); ok {
+		_spec.AddField(valuelog.FieldValue2, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.Timestamp(); ok {
+		_spec.SetField(valuelog.FieldTimestamp, field.TypeTime, value)
+	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{valuelog.Label}
@@ -86,6 +158,62 @@ type ValueLogUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ValueLogMutation
+}
+
+// SetValue1 sets the "value1" field.
+func (_u *ValueLogUpdateOne) SetValue1(v int) *ValueLogUpdateOne {
+	_u.mutation.ResetValue1()
+	_u.mutation.SetValue1(v)
+	return _u
+}
+
+// SetNillableValue1 sets the "value1" field if the given value is not nil.
+func (_u *ValueLogUpdateOne) SetNillableValue1(v *int) *ValueLogUpdateOne {
+	if v != nil {
+		_u.SetValue1(*v)
+	}
+	return _u
+}
+
+// AddValue1 adds value to the "value1" field.
+func (_u *ValueLogUpdateOne) AddValue1(v int) *ValueLogUpdateOne {
+	_u.mutation.AddValue1(v)
+	return _u
+}
+
+// SetValue2 sets the "value2" field.
+func (_u *ValueLogUpdateOne) SetValue2(v int) *ValueLogUpdateOne {
+	_u.mutation.ResetValue2()
+	_u.mutation.SetValue2(v)
+	return _u
+}
+
+// SetNillableValue2 sets the "value2" field if the given value is not nil.
+func (_u *ValueLogUpdateOne) SetNillableValue2(v *int) *ValueLogUpdateOne {
+	if v != nil {
+		_u.SetValue2(*v)
+	}
+	return _u
+}
+
+// AddValue2 adds value to the "value2" field.
+func (_u *ValueLogUpdateOne) AddValue2(v int) *ValueLogUpdateOne {
+	_u.mutation.AddValue2(v)
+	return _u
+}
+
+// SetTimestamp sets the "timestamp" field.
+func (_u *ValueLogUpdateOne) SetTimestamp(v time.Time) *ValueLogUpdateOne {
+	_u.mutation.SetTimestamp(v)
+	return _u
+}
+
+// SetNillableTimestamp sets the "timestamp" field if the given value is not nil.
+func (_u *ValueLogUpdateOne) SetNillableTimestamp(v *time.Time) *ValueLogUpdateOne {
+	if v != nil {
+		_u.SetTimestamp(*v)
+	}
+	return _u
 }
 
 // Mutation returns the ValueLogMutation object of the builder.
@@ -158,6 +286,21 @@ func (_u *ValueLogUpdateOne) sqlSave(ctx context.Context) (_node *ValueLog, err 
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.Value1(); ok {
+		_spec.SetField(valuelog.FieldValue1, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedValue1(); ok {
+		_spec.AddField(valuelog.FieldValue1, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.Value2(); ok {
+		_spec.SetField(valuelog.FieldValue2, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedValue2(); ok {
+		_spec.AddField(valuelog.FieldValue2, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.Timestamp(); ok {
+		_spec.SetField(valuelog.FieldTimestamp, field.TypeTime, value)
 	}
 	_node = &ValueLog{config: _u.config}
 	_spec.Assign = _node.assignValues

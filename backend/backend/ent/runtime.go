@@ -2,8 +2,20 @@
 
 package ent
 
+import (
+	"radare-core/backend/backend/ent/schema"
+	"radare-core/backend/backend/ent/valuelog"
+	"time"
+)
+
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	valuelogFields := schema.ValueLog{}.Fields()
+	_ = valuelogFields
+	// valuelogDescTimestamp is the schema descriptor for timestamp field.
+	valuelogDescTimestamp := valuelogFields[2].Descriptor()
+	// valuelog.DefaultTimestamp holds the default value on creation for the timestamp field.
+	valuelog.DefaultTimestamp = valuelogDescTimestamp.Default.(func() time.Time)
 }

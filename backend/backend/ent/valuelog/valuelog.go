@@ -3,6 +3,8 @@
 package valuelog
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -11,6 +13,12 @@ const (
 	Label = "value_log"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldValue1 holds the string denoting the value1 field in the database.
+	FieldValue1 = "value1"
+	// FieldValue2 holds the string denoting the value2 field in the database.
+	FieldValue2 = "value2"
+	// FieldTimestamp holds the string denoting the timestamp field in the database.
+	FieldTimestamp = "timestamp"
 	// Table holds the table name of the valuelog in the database.
 	Table = "value_logs"
 )
@@ -18,6 +26,9 @@ const (
 // Columns holds all SQL columns for valuelog fields.
 var Columns = []string{
 	FieldID,
+	FieldValue1,
+	FieldValue2,
+	FieldTimestamp,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -30,10 +41,30 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+var (
+	// DefaultTimestamp holds the default value on creation for the "timestamp" field.
+	DefaultTimestamp func() time.Time
+)
+
 // OrderOption defines the ordering options for the ValueLog queries.
 type OrderOption func(*sql.Selector)
 
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByValue1 orders the results by the value1 field.
+func ByValue1(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldValue1, opts...).ToFunc()
+}
+
+// ByValue2 orders the results by the value2 field.
+func ByValue2(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldValue2, opts...).ToFunc()
+}
+
+// ByTimestamp orders the results by the timestamp field.
+func ByTimestamp(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTimestamp, opts...).ToFunc()
 }

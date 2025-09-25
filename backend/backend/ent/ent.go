@@ -6,13 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"radare-core/backend/backend/ent/valuelog"
 	"reflect"
 	"sync"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"radare.com/backend/backend/backend/ent/valuelog"
 )
 
 // ent aliases to avoid import conflicts in user's code.

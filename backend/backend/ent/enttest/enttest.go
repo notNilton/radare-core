@@ -5,12 +5,13 @@ package enttest
 import (
 	"context"
 
-	"radare.com/backend/backend/backend/ent"
+	"radare-core/backend/backend/ent"
 	// required by schema hooks.
-	_ "radare.com/backend/backend/backend/ent/runtime"
+	_ "radare-core/backend/backend/ent/runtime"
+
+	"radare-core/backend/backend/ent/migrate"
 
 	"entgo.io/ent/dialect/sql/schema"
-	"radare.com/backend/backend/backend/ent/migrate"
 )
 
 type (
