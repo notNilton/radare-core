@@ -1,20 +1,9 @@
-import React, { useCallback } from "react";
-import ReactFlow, {
-  Controls,
-  Background,
-  useNodesState,
-  useEdgesState,
-  addEdge,
-  Connection,
-  Edge,
-  Panel,
-  MarkerType,
-} from "reactflow";
+import { MarkerType } from "reactflow";
 
 import cnOneThree from "./customNodeOneThree";
 import cnOneOne from "./customNodeOneOne";
 import cnTwoTwo from "./customNodeTwoTwo";
-import cnTwoOne from "./customNodeOneTwo";
+import cnTwoOne from "./customNodeTwoOne";
 import cnOneTwo from "./customNodeOneTwo";
 
 const nodeTypes = {
@@ -84,8 +73,7 @@ const initialEdges = [
     type: "step",
     source: "Input",
     target: "Node",
-    value: 161,
-    tolerance: 0.05,
+    data: { value: 161, tolerance: 0.05 },
     label: `Valor: 161, Tolerância: 0.05`,
     markerEnd: {
       type: MarkerType.ArrowClosed,
@@ -96,8 +84,7 @@ const initialEdges = [
     type: "step",
     source: "Node",
     target: "Output1",
-    value: 79,
-    tolerance: 0.01,
+    data: { value: 79, tolerance: 0.01 },
     label: `Valor: 79, Tolerância: 0.01`,
     markerEnd: {
       type: MarkerType.ArrowClosed,
@@ -109,8 +96,7 @@ const initialEdges = [
     source: "Node",
     sourceHandle: "b",
     target: "Output2",
-    value: 80,
-    tolerance: 0.01,
+    data: { value: 80, tolerance: 0.01 },
     label: `Valor: 80, Tolerância: 0.01`,
     markerEnd: {
       type: MarkerType.ArrowClosed,

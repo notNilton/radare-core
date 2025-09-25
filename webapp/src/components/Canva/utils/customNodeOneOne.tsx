@@ -1,29 +1,35 @@
 import React, { memo } from "react";
 import { Handle, Position } from "reactflow";
 
-const customNodeOneThree = ({ data }) => {
-  const { label, isConnectable } = data;
+interface CustomNodeData {
+  label: string;
+  isConnectable: boolean;
+}
 
+interface CustomNodeProps {
+  data: CustomNodeData;
+}
+
+const CustomNodeOneOne: React.FC<CustomNodeProps> = ({ data }) => {
   return (
     <>
       <Handle
         type="target"
-        id="a"
+        id="target"
         position={Position.Left}
         style={{ background: "black" }}
-        isConnectable={isConnectable}
-      ></Handle>
-
+        isConnectable={data.isConnectable}
+      />
       <Handle
         type="source"
         position={Position.Right}
-        id="b"
-        style={{ background: "#784be8" }}
-        isConnectable={isConnectable}
-      ></Handle>
-      <div>{`${label}`}</div>
+        id="a"
+        style={{ top: 50, background: "#784be8" }}
+        isConnectable={data.isConnectable}
+      />
+      <div>{data.label}</div>
     </>
   );
 };
 
-export default memo(customNodeOneThree);
+export default memo(CustomNodeOneOne);
