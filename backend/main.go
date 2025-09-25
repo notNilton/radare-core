@@ -14,36 +14,42 @@ import (
 	"time"
 )
 
+// main é o ponto de entrada da aplicação.
+// Ele inicializa o banco de dados, configura as rotas da API,
+// inicia o servidor HTTP e lida com o desligamento gracioso.
 func main() {
-	// Inicializa o cliente do banco de dados
+	// Inicializa o cliente do banco de dados Ent.
+	// A função NewClient também lida com as migrações do esquema.
 	client := db.NewClient()
 	defer client.Close()
 
-	// Cria uma instância dos handlers, injetando o cliente do banco de dados
+	// Cria uma nova instância dos manipuladores da aplicação, injetando o cliente do banco de dados.
 	h := handlers.New(client)
 
-	// Define os manipuladores para as rotas, usando o middleware para tratamento de erros
-	http.HandleFunc("/api/current-values", middleware.ErrorHandler(h.GetCurrentValues))
-	http.HandleFunc("/api/values/history", middleware.ErrorHandler(h.GetValueHistory))
-	http.HandleFunc("/healthz", middleware.ErrorHandler(handlers.HealthCheck)) // HealthCheck pode permanecer sem estado
+	// Registra os manipuladores de rota para os endpoints da API.
+	// O ErrorHandler é um middleware que centraliza o tratamento de erros.
+	http.HandleFunc("/current-values", middleware.ErrorHandler(h.GetCurrentValues))
+	http.HandleFunc("/values/history", middleware.ErrorHandler(h.GetValueHistory))
+	http.HandleFunc("/healthz", middleware.ErrorHandler(handlers.HealthCheck))
 
-	// Obtém a porta da variável de ambiente PORT ou usa 8080 como padrão
+	// Determina a porta do servidor a partir da variável de ambiente PORT, ou usa 8080 como padrão.
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	// Cria um servidor HTTP
+	// Configura o servidor HTTP.
 	server := &http.Server{
 		Addr:    ":" + port,
-		Handler: http.DefaultServeMux,
+		Handler: http.DefaultServeMux, // Usa o multiplexador de requisições padrão.
 	}
 
-	// Canal para receber sinais de interrupção ou terminação
+	// Configura um canal para ouvir os sinais de interrupção do sistema (SIGINT, SIGTERM)
+	// para um desligamento gracioso.
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
-	// Inicia o servidor em uma goroutine
+	// Inicia o servidor HTTP em uma goroutine separada para não bloquear a execução principal.
 	go func() {
 		log.Println("Servidor iniciado na porta " + port + "...")
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -51,20 +57,20 @@ func main() {
 		}
 	}()
 
-	// Inicia a goroutine para atualizar os valores no banco de dados
+	// Inicia a goroutine que atualiza os valores no banco de dados periodicamente.
 	go h.StartValueUpdater()
 
-	// Aguarda o sinal de interrupção
+	// Bloqueia a execução até que um sinal de desligamento seja recebido.
 	sig := <-sigChan
-	log.Printf("Sinal de desligamento recebido: %v, iniciando graceful shutdown...\n", sig)
+	log.Printf("Sinal de desligamento recebido: %v, iniciando desligamento gracioso...\n", sig)
 
-	// Cria um contexto com timeout para o shutdown
+	// Cria um contexto com um timeout de 30 segundos para o desligamento.
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	// Inicia o processo de shutdown do servidor
+	// Tenta desligar o servidor graciosamente.
 	if err := server.Shutdown(shutdownCtx); err != nil {
-		log.Fatalf("Erro durante o shutdown do servidor: %v\n", err)
+		log.Fatalf("Erro durante o desligamento do servidor: %v\n", err)
 	}
 
 	log.Println("Servidor desligado com sucesso.")

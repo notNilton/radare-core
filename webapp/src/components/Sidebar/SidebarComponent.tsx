@@ -1,135 +1,62 @@
-import React, { useState, useEffect, useCallback } from "react";
-import "./SidebarComponent.scss";
+import React, { useState, useEffect } from 'react';
+import { getCurrentValues } from '../../api/service';
+import './SidebarComponent.scss';
 
-interface CorrectionEntry {
+interface CurrentValue {
   id: number;
-  values: string[];
+  value1: number;
+  value2: number;
+  created_at: string;
 }
 
 const SidebarComponent: React.FC = () => {
-  const [visibleSidebarContent, setVisibleSidebarContent] = useState<{
-    [key: string]: boolean;
-  }>({
-    "tags-existentes": true,
-    "tags-selecionadas": true,
-    matriz: true,
-    reconciled: true,
-  });
+  const [currentValue, setCurrentValue] = useState<CurrentValue | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const [correctionValues, setCorrectionValues] = useState<CorrectionEntry[]>([]);
-  const [existingTags, setExistingTags] = useState<string[]>([]);
-  const [matrixData, setMatrixData] = useState<number[][]>([]);
-
-  const loadAllCorrectionValues = (): CorrectionEntry[] => {
-    const storedData = JSON.parse(localStorage.getItem("reconciliationData") || "[]");
-    if (Array.isArray(storedData)) {
-      return storedData.map((entry: { id: number; tagcorrection: string[] }) => ({
-        id: entry.id,
-        values: entry.tagcorrection || [],
-      }));
-    }
-    return [];
-  };
-
-  const loadLastEntryData = () => {
-    const storedData = JSON.parse(localStorage.getItem("reconciliationData") || "[]");
-    if (Array.isArray(storedData) && storedData.length > 0) {
-      const lastEntry = storedData[storedData.length - 1];
-      
-      if (lastEntry.tagname) {
-        setExistingTags(lastEntry.tagname);
+  const fetchCurrentValues = async () => {
+    try {
+      const data = await getCurrentValues();
+      if (data) {
+        setCurrentValue(data);
+        setError(null);
       }
-      
-      if (lastEntry.tagmatrix) {
-        setMatrixData(lastEntry.tagmatrix);
-      }
+    } catch (err) {
+      setError('Falha ao buscar os valores atuais.');
+      console.error(err);
     }
   };
-
-  const updateDataFromLocalStorage = useCallback(() => {
-    setCorrectionValues(loadAllCorrectionValues());
-    loadLastEntryData();
-  }, []);
 
   useEffect(() => {
-    updateDataFromLocalStorage();
+    fetchCurrentValues();
+    const interval = setInterval(fetchCurrentValues, 2000); // Atualiza a cada 2 segundos
 
-    const handleStorageUpdate = () => {
-      updateDataFromLocalStorage();
-    };
-
-    window.addEventListener("localStorageUpdated", handleStorageUpdate);
-
-    return () => {
-      window.removeEventListener("localStorageUpdated", handleStorageUpdate);
-    };
-  }, [updateDataFromLocalStorage]);
-
-  const toggleSidebarContent = (key: string) => {
-    setVisibleSidebarContent((prevState) => ({
-      ...prevState,
-      [key]: !prevState[key],
-    }));
-  };
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <>
-      <div className="sidebar-title" onClick={() => toggleSidebarContent("tags-existentes")}>
-        Tags Existentes
-      </div>
+    <div className="sidebar-container">
+      <div className="sidebar-title">Valores Atuais</div>
       <div className="sidebar-content">
-        <div className="tag-container">
-          {existingTags.map((tag, index) => (
-            <div key={index} className="tag-item">{tag}</div>
-          ))}
-        </div>
+        {error && <p className="error-message">{error}</p>}
+        {currentValue ? (
+          <div className="values-display">
+            <div className="value-item">
+              <span className="value-label">Value 1:</span>
+              <span className="value-data">{currentValue.value1}</span>
+            </div>
+            <div className="value-item">
+              <span className="value-label">Value 2:</span>
+              <span className="value-data">{currentValue.value2}</span>
+            </div>
+            <div className="timestamp">
+              Última atualização: {new Date(currentValue.created_at).toLocaleString()}
+            </div>
+          </div>
+        ) : (
+          !error && <p>Carregando valores...</p>
+        )}
       </div>
-
-      <div className="sidebar-title matrix" onClick={() => toggleSidebarContent("matriz")}>
-        Matriz de Incidência
-      </div>
-      <div className={`sidebar-content matrix${visibleSidebarContent["matriz"] ? " visible" : ""}`}>
-        <div className="matrix-container">
-          <table>
-            <tbody>
-              {matrixData.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                  {row.map((cell, cellIndex) => (
-                    <td key={cellIndex}>{cell}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="sidebar-title correction-values" onClick={() => toggleSidebarContent("reconciled")}>
-        Valores de Correção
-      </div>
-      <div className={`sidebar-content correction-values-content${visibleSidebarContent["reconciled"] ? " visible" : ""}`}>
-        <table className="correction-values-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              {correctionValues.length > 0 && correctionValues[0].values.map((_, index) => (
-                <th key={index}>Valor {index + 1}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {correctionValues.map((entry) => (
-              <tr key={entry.id}>
-                <td>{entry.id}</td>
-                {entry.values.map((value, index) => (
-                  <td key={index}>{value}</td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
+    </div>
   );
 };
 

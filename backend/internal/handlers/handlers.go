@@ -11,89 +11,89 @@ import (
 	"time"
 )
 
-// Handler é uma struct que contém o cliente do banco de dados.
+// Handler encapsula as dependências para os manipuladores HTTP, como o cliente do banco de dados.
 type Handler struct {
 	client *ent.Client
 }
 
-// New cria uma nova instância de Handler.
+// New cria e retorna uma nova instância de Handler.
+// Ele injeta o cliente do banco de dados para ser usado pelos manipuladores de rota.
 func New(client *ent.Client) *Handler {
 	return &Handler{client: client}
 }
 
-// StartValueUpdater inicia uma goroutine para atualizar os valores no banco de dados.
+// StartValueUpdater é uma goroutine de longa duração que gera e salva novos valores no banco de dados
+// a cada segundo. Ele alterna dois valores para simular dados de séries temporais.
 func (h *Handler) StartValueUpdater() {
-	var value1, value2 = 50, 100 // Valores iniciais
+	// Define os valores iniciais que serão alternados.
+	var value1, value2 = 50, 100
+	// Cria um ticker que dispara a cada 1 segundo.
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
 
 	for {
 		select {
+		// Aguarda o próximo tick.
 		case <-ticker.C:
-			// Alterna os valores
+			// Alterna os valores.
 			value1, value2 = value2, value1
 
-			// Cria um novo registro no banco de dados
+			// Cria um novo registro de ValueLog no banco de dados com os novos valores.
 			_, err := h.client.ValueLog.
 				Create().
 				SetValue1(value1).
 				SetValue2(value2).
 				Save(context.Background())
 			if err != nil {
+				// Loga qualquer erro que ocorra durante a inserção no banco de dados.
 				log.Printf("Erro ao salvar valores no banco de dados: %v", err)
 			}
 		}
 	}
 }
 
-// GetCurrentValues retorna o registro mais recente do banco de dados.
+// GetCurrentValues é um manipulador HTTP que busca e retorna o registro de valor mais recente.
 func (h *Handler) GetCurrentValues(w http.ResponseWriter, r *http.Request) error {
-	// Busca o último registro pelo ID em ordem decrescente
+	// Consulta o banco de dados para o último registro de ValueLog, ordenado por ID decrescente.
 	latest, err := h.client.ValueLog.
 		Query().
 		Order(ent.Desc(valuelog.FieldID)).
-		First(r.Context())
+		First(r.Context()) // First() retorna apenas o primeiro resultado.
 	if err != nil {
-		// Se não houver registros, retorna um erro amigável
+		// Se nenhum registro for encontrado, retorna um status 404 Not Found.
 		if ent.IsNotFound(err) {
 			http.Error(w, "Nenhum valor encontrado ainda. Tente novamente em alguns segundos.", http.StatusNotFound)
-			return nil
+			return nil // Retorna nil porque a resposta de erro já foi escrita.
 		}
-		// Para outros erros, retorna o erro para o middleware
+		// Para qualquer outro erro, retorna o erro para ser tratado pelo middleware.
 		return err
 	}
 
+	// Define o cabeçalho Content-Type e codifica o resultado em JSON.
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(latest); err != nil {
-		return err
-	}
-	return nil
+	return json.NewEncoder(w).Encode(latest)
 }
 
-// GetValueHistory retorna os últimos 10 registros do banco de dados.
+// GetValueHistory é um manipulador HTTP que busca e retorna os últimos 10 registros de valor.
 func (h *Handler) GetValueHistory(w http.ResponseWriter, r *http.Request) error {
-	// Busca os últimos 10 registros
+	// Consulta o banco de dados para os últimos 10 registros de ValueLog.
 	history, err := h.client.ValueLog.
 		Query().
-		Order(ent.Desc(valuelog.FieldID)).
-		Limit(10).
-		All(r.Context())
+		Order(ent.Desc(valuelog.FieldID)). // Ordena por ID para obter os mais recentes.
+		Limit(10).                         // Limita o resultado a 10.
+		All(r.Context())                   // All() retorna todos os resultados correspondentes.
 	if err != nil {
 		return err
 	}
 
+	// Define o cabeçalho Content-Type e codifica o resultado em JSON.
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(history); err != nil {
-		return err
-	}
-	return nil
+	return json.NewEncoder(w).Encode(history)
 }
 
-// HealthCheck retorna o status do servidor.
+// HealthCheck é um manipulador HTTP simples para verificações de saúde, retornando um status "ok".
 func HealthCheck(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(map[string]string{"status": "ok"}); err != nil {
-		return err
-	}
-	return nil
+	return json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 }
