@@ -7,6 +7,8 @@ require (
 	modernc.org/sqlite v1.39.0
 )
 
+require github.com/joho/godotenv v1.5.1 // indirect
+
 require (
 	ariga.io/atlas v0.32.1-0.20250325101103-175b25e1c1b9 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
@@ -17,6 +19,7 @@ require (
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.18.1 // indirect
+	github.com/lib/pq v1.10.9
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
