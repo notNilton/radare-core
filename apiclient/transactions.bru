@@ -1,0 +1,45 @@
+meta {
+  name: Create Transaction
+  type: http
+  seq: 6
+}
+
+# Creates a new transaction for the authenticated user.
+# Assumes a category has already been created and its ID is known (e.g., 1).
+post {
+  url: {{host}}/api/transactions
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "description": "Weekly grocery shopping",
+    "amount": 150.75,
+    "date": "2024-07-20T10:00:00Z",
+    "category_id": 1
+  }
+}
+
+##################################################
+
+meta {
+  name: Get Transactions
+  type: http
+  seq: 7
+}
+
+# Retrieves all transactions for the authenticated user.
+get {
+  url: {{host}}/api/transactions
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

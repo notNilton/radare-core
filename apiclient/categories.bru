@@ -1,0 +1,41 @@
+meta {
+  name: Categories
+  type: http
+  seq: 4
+}
+
+# Creates a new category for the authenticated user.
+post {
+  url: {{host}}/api/categories
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Groceries"
+  }
+}
+
+##################################################
+
+meta {
+  name: Get Categories
+  type: http
+  seq: 5
+}
+
+# Retrieves all categories for the authenticated user.
+get {
+  url: {{host}}/api/categories
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

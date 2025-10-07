@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"radare-datarecon/backend/internal/budget"
 	"radare-datarecon/backend/internal/config"
 	"radare-datarecon/backend/internal/database"
 	"radare-datarecon/backend/internal/handlers"
@@ -23,20 +24,27 @@ func main() {
 
 	// Connect to the database and migrate the schema.
 	database.Connect(cfg)
-	if err := database.DB.AutoMigrate(&models.User{}); err != nil {
+	if err := database.DB.AutoMigrate(&models.User{}, &models.Transaction{}, &models.Category{}); err != nil {
 		log.Fatalf("Failed to migrate database schema: %v", err)
 	}
 
 	// Instantiate the authentication middleware with the JWT secret.
 	authMiddleware := middleware.NewAuthMiddleware(cfg.JWTSecret)
 
+	// Instantiate the budget service and handlers.
+	budgetService := budget.NewService(database.DB)
+	budgetHandlers := budget.NewHandlers(budgetService)
+
 	// Register handlers for the API endpoints.
 	// Each handler is wrapped with middleware for logging, error handling, and authentication.
 	http.Handle("/api/register", middleware.LoggingMiddleware(middleware.ErrorHandler(handlers.Register)))
 	http.Handle("/api/login", middleware.LoggingMiddleware(middleware.ErrorHandler(handlers.LoginHandler(cfg.JWTSecret))))
-	http.Handle("/api/current-values", middleware.LoggingMiddleware(authMiddleware(middleware.ErrorHandler(handlers.GetCurrentValues))))
-	http.Handle("/api/reconcile", middleware.LoggingMiddleware(authMiddleware(middleware.ErrorHandler(handlers.ReconcileData))))
 	http.Handle("/healthz", middleware.LoggingMiddleware(middleware.ErrorHandler(handlers.HealthCheck)))
+
+	// Budgeting endpoints
+	http.Handle("/api/categories", middleware.LoggingMiddleware(authMiddleware(middleware.ErrorHandler(budgetHandlers.HandleCategories))))
+	http.Handle("/api/transactions", middleware.LoggingMiddleware(authMiddleware(middleware.ErrorHandler(budgetHandlers.HandleTransactions))))
+	http.Handle("/api/budget/summary", middleware.LoggingMiddleware(authMiddleware(middleware.ErrorHandler(budgetHandlers.GetMonthlySummary))))
 
 	// Create and configure the HTTP server.
 	server := &http.Server{

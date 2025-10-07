@@ -1,0 +1,16 @@
+meta {
+  name: Get Monthly Summary
+  type: http
+  seq: 8
+}
+
+# Retrieves the total expenses for a given month and year.
+get {
+  url: {{host}}/api/budget/summary?year=2024&month=7
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
