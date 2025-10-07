@@ -1,0 +1,35 @@
+meta {
+  name: Update User Profile
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{host}}/api/user/profile
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+body:json {
+  {
+    "name": "New Name",
+    "contact_email": "new.email@example.com"
+  }
+}
+
+docs {
+  # Atualizar Perfil do Usuário
+
+  Este endpoint atualiza o perfil do usuário autenticado.
+
+  **Corpo da Requisição:**
+  - Você pode enviar qualquer combinação de campos para atualizar.
+  - O exemplo atualiza o nome e o e-mail de contato.
+
+  **Autenticação:**
+  - Requer um token `Bearer`.
+}

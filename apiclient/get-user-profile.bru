@@ -1,0 +1,26 @@
+meta {
+  name: Get User Profile
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{host}}/api/user/profile
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+docs {
+  # Obter Perfil do Usuário
+
+  Este endpoint retorna o perfil do usuário autenticado.
+
+  **Autenticação:**
+
+  - Requer um token `Bearer` no cabeçalho de autorização.
+  - O token é obtido da variável de ambiente `authToken` após o login.
+}

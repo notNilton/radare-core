@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"radare-datarecon/backend/internal/config"
+	"radare-datarecon/backend/internal/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -24,5 +25,11 @@ func Connect(cfg *config.Config) {
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to connect to database")
+	}
+
+	// Auto-migrate models
+	err = DB.AutoMigrate(&models.User{}, &models.Fueling{})
+	if err != nil {
+		log.Fatalf("Failed to auto-migrate database: %v", err)
 	}
 }

@@ -1,0 +1,41 @@
+meta {
+  name: Create Fueling Record
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{host}}/api/fueling
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+body:json {
+  {
+    "cost": 50.0,
+    "fuel_type": "Gasoline",
+    "location": "Gas Station A",
+    "car_km": 10000,
+    "timestamp": "2024-01-01T12:00:00Z"
+  }
+}
+
+docs {
+  # Criar Registro de Abastecimento
+
+  Este endpoint cria um novo registro de abastecimento para o usuário autenticado.
+
+  **Corpo da Requisição:**
+  - `cost`: O custo do abastecimento.
+  - `fuel_type`: O tipo de combustível.
+  - `location`: O local do posto de gasolina.
+  - `car_km`: A quilometragem do carro no momento do abastecimento.
+  - `timestamp`: A data e hora do abastecimento.
+
+  **Autenticação:**
+  - Requer um token `Bearer`.
+}

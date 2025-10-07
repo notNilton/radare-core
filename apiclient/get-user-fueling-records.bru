@@ -1,0 +1,24 @@
+meta {
+  name: Get User Fueling Records
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{host}}/api/fueling
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+docs {
+  # Obter Registros de Abastecimento do Usuário
+
+  Este endpoint retorna todos os registros de abastecimento do usuário autenticado.
+
+  **Autenticação:**
+  - Requer um token `Bearer`.
+}

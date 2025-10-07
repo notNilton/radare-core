@@ -14,34 +14,48 @@ import (
 	"radare-datarecon/backend/internal/database"
 	"radare-datarecon/backend/internal/handlers"
 	"radare-datarecon/backend/internal/middleware"
-	"radare-datarecon/backend/internal/models"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
 	// Load application configuration from environment variables.
 	cfg := config.Load()
 
-	// Connect to the database and migrate the schema.
+	// Connect to the database and auto-migrate schemas.
 	database.Connect(cfg)
-	if err := database.DB.AutoMigrate(&models.User{}); err != nil {
-		log.Fatalf("Failed to migrate database schema: %v", err)
-	}
+
+	// Set up the router.
+	r := mux.NewRouter()
 
 	// Instantiate the authentication middleware with the JWT secret.
 	authMiddleware := middleware.NewAuthMiddleware(cfg.JWTSecret)
 
-	// Register handlers for the API endpoints.
-	// Each handler is wrapped with middleware for logging, error handling, and authentication.
-	http.Handle("/api/register", middleware.LoggingMiddleware(middleware.ErrorHandler(handlers.Register)))
-	http.Handle("/api/login", middleware.LoggingMiddleware(middleware.ErrorHandler(handlers.LoginHandler(cfg.JWTSecret))))
-	http.Handle("/api/current-values", middleware.LoggingMiddleware(authMiddleware(middleware.ErrorHandler(handlers.GetCurrentValues))))
-	http.Handle("/api/reconcile", middleware.LoggingMiddleware(authMiddleware(middleware.ErrorHandler(handlers.ReconcileData))))
-	http.Handle("/healthz", middleware.LoggingMiddleware(middleware.ErrorHandler(handlers.HealthCheck)))
+	// Public routes
+	r.Handle("/api/register", middleware.LoggingMiddleware(middleware.ErrorHandler(handlers.Register))).Methods("POST")
+	r.Handle("/api/login", middleware.LoggingMiddleware(middleware.ErrorHandler(handlers.LoginHandler(cfg.JWTSecret)))).Methods("POST")
+	r.Handle("/healthz", middleware.LoggingMiddleware(middleware.ErrorHandler(handlers.HealthCheck))).Methods("GET")
+
+	// User-related routes (protected)
+	userRouter := r.PathPrefix("/api/user").Subrouter()
+	userRouter.Use(authMiddleware)
+	userRouter.Handle("/profile", middleware.LoggingMiddleware(middleware.ErrorHandler(handlers.GetUserProfile))).Methods("GET")
+	userRouter.Handle("/profile", middleware.LoggingMiddleware(middleware.ErrorHandler(handlers.UpdateUserProfile))).Methods("PUT")
+	userRouter.Handle("/password", middleware.LoggingMiddleware(middleware.ErrorHandler(handlers.ChangePassword))).Methods("POST")
+
+	// Fueling-related routes (protected)
+	fuelingRouter := r.PathPrefix("/api/fueling").Subrouter()
+	fuelingRouter.Use(authMiddleware)
+	fuelingRouter.Handle("", middleware.LoggingMiddleware(middleware.ErrorHandler(handlers.CreateFuelingRecord))).Methods("POST")
+	fuelingRouter.Handle("", middleware.LoggingMiddleware(middleware.ErrorHandler(handlers.GetUserFuelingRecords))).Methods("GET")
+	fuelingRouter.Handle("/{id}", middleware.LoggingMiddleware(middleware.ErrorHandler(handlers.UpdateFuelingRecord))).Methods("PUT")
+	fuelingRouter.Handle("/{id}", middleware.LoggingMiddleware(middleware.ErrorHandler(handlers.DeleteFuelingRecord))).Methods("DELETE")
+
 
 	// Create and configure the HTTP server.
 	server := &http.Server{
 		Addr:         ":" + cfg.ServerPort,
-		Handler:      http.DefaultServeMux,
+		Handler:      r, // Use the gorilla/mux router
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 		IdleTimeout:  60 * time.Second,

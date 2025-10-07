@@ -1,0 +1,37 @@
+meta {
+  name: Update Fueling Record
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{host}}/api/fueling/1
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+body:json {
+  {
+    "cost": 55.0,
+    "location": "Gas Station B"
+  }
+}
+
+docs {
+  # Atualizar Registro de Abastecimento
+
+  Este endpoint atualiza um registro de abastecimento existente.
+
+  **URL:**
+  - O `1` no final da URL é o ID do registro a ser atualizado.
+
+  **Corpo da Requisição:**
+  - Você pode enviar qualquer combinação de campos para atualizar.
+
+  **Autenticação:**
+  - Requer um token `Bearer`.
+}
